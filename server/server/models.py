@@ -18,4 +18,5 @@ class tbl_user(models.Model):
     user_address = models.CharField(max_length=100)
     place = models.ForeignKey(tbl_place,on_delete=models.CASCADE)
     user_password = models.CharField(max_length=100)
+    user_status = models.IntegerField(default=0)
     user_photo = models.FileField(upload_to="Assets/UserDocs")

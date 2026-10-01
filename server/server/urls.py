@@ -25,7 +25,18 @@ urlpatterns = [
     # user
     path('user/',views.user),
     path('user_list/',views.user_list),
+    path('login/',views.login),
+    path('user_accept/<int:uid>/',views.user_accept),
+    path('user_reject/<int:uid>/',views.user_reject),
 
+    path('user_single/<int:uid>/',views.user_single),
+
+    path('user_edit/<int:uid>/',views.user_edit),
+
+    path('change_password/<int:uid>/',views.change_password),
+
+    # login
+    path('login/',views.login),
 
 ]
 

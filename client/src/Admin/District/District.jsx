@@ -9,9 +9,12 @@ const District = () => {
     const handleSubmit = async () => {
         try {
             if (editId) {
-                const response = await axios.put(`http://127.0.0.1:8000/district_edit/${editId}/`, { districtName })
-                alert('District Inserted Successfully')
+                const formData = new FormData();
+                formData.append('districtName', districtName);
+                const response = await axios.post(`http://127.0.0.1:8000/district_edit/${editId}/`, formData)
+                alert('District Updated Successfully')
                 setDistrictName("")
+                setEditId(null)
                 fetchData()
             }
             else {

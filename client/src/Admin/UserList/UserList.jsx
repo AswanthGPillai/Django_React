@@ -7,7 +7,7 @@ const UserList = () => {
 
 
     console.log(userData);
-    
+
 
     const fetchUser = async () => {
         try {
@@ -27,9 +27,27 @@ const UserList = () => {
     }, []);
 
 
+    const handleAccept = async (id) => {
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/user_accept/${id}/`)
+            alert('User Accepted Successfully...')
+            fetchUser()
 
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
+    const handleReject = async (id) => {
+        try {
+            const response = await axios.post(`http://127.0.0.1:8000/user_reject/${id}/`)
+            alert('User Rejected Successfully...')
+            fetchUser()
 
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
 
@@ -48,13 +66,16 @@ const UserList = () => {
                 {
                     userData.map((data, index) => (
                         <tr key={data.id}>
-                            <td>{index+1}</td>
+                            <td>{index + 1}</td>
                             <td>{data.user_name}</td>
                             <td>{data.user_email}</td>
                             <td>{data.user_address}</td>
                             <td>{data.place__district__district_name}</td>
                             <td>{data.place__place_name}</td>
                             <td><img src={`http://127.0.0.1:8000/${data.user_photo}`} width={150} height={150} /></td>
+                            <td><button onClick={() => handleAccept(data.id)}>Accept</button>
+                                <button onClick={() => handleReject(data.id)}>Reject</button>
+                            </td>
 
                         </tr>
                     ))

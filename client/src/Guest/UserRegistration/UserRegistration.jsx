@@ -11,6 +11,8 @@ const UserRegistration = () => {
     const [place, setPlace] = useState("")
     const [districts, setDistricts] = useState([])
     const [places, setPlaces] = useState([])
+
+    
     console.log(district);
 
     console.log(places);

@@ -1,3 +1,6 @@
+from itertools import count
+from urllib import request
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -12,8 +15,7 @@ from server.models import *
 def district(request):
     districtData = list(tbl_district.objects.values())
     if request.method == 'POST':
-        data = json.loads(request.body)
-        district_name = data['districtName']
+        district_name =  request.POST.get("districtName")
         tbl_district.objects.create(
             district_name = district_name
         )
@@ -36,9 +38,8 @@ def district_del(request,did):
 @csrf_exempt
 def district_edit(request,uid):
     districtData = tbl_district.objects.get(id=uid)
-    if request.method == 'PUT':
-        data = json.loads(request.body)
-        district_name = data['name']
+    if request.method == 'POST':
+        district_name = request.POST.get("districtName")
         districtData.district_name = district_name
         districtData.save()
         return JsonResponse({"msg":"district updated successfully"})
@@ -65,23 +66,47 @@ def admin_registration(request):
     return JsonResponse({"adminData":adminData})
 
 
+
+
+
+
 @csrf_exempt
 def admin_delete(request,did):
     if request.method == 'DELETE':
-        tbl_admin.objects.get(id=did).delete()
+        tbl_admin.objects.get(id=did).delete()  
         return JsonResponse({"msg":"Data Deleted Successfully"})
+
+
+    
 
 @csrf_exempt
 def admin_edit(request,eid):
     adminData = tbl_admin.objects.get(id=eid)
-    if request.method == 'PUT':
-        data = json.loads(request.body)
-        name = data['name']
-        email = data['email']
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        email = request.POST.get("email")
         adminData.admin_name = name
         adminData.admin_email = email
         adminData.save()
         return JsonResponse({"msg":"admin updated successfully"})
+    return JsonResponse({"adminData":adminData})
+
+
+
+
+# @csrf_exempt
+# def admin_edit(request,eid):
+#     adminData = tbl_admin.objects.get(id=eid)
+#     if request.method == 'PUT':
+#         data = json.loads(request.body)
+#         name = data['name']
+#         email = data['email']
+#         adminData.admin_name = name
+#         adminData.admin_email = email
+#         adminData.save()
+#         return JsonResponse({"msg":"admin updated successfully"})
+
+
 
 
 
@@ -122,11 +147,10 @@ def place_delete(request,did):
 @csrf_exempt
 def place_edit(request,eid):
     placeData = tbl_place.objects.get(id=eid)
-    if request.method == 'PUT':
-        data = json.loads(request.body) 
-        name = data["place_name"]
-        district = tbl_district.objects.get(id=data["district"])
-        placeData.place_name = name
+    if request.method == 'POST':
+        place_name = request.POST.get("place_name")
+        district = tbl_district.objects.get(id=request.POST.get("district"))
+        placeData.place_name = place_name
         placeData.district = district
         placeData.save()
         return JsonResponse({"msg":"place updated successfully"})
@@ -162,10 +186,109 @@ def user(request):
         return JsonResponse({'msg':"Profile Uploded.."})
 
 
-
+@csrf_exempt
 def user_list(request):
-    if request.method == "GET" :
-        userdata = list(tbl_user.objects.values('id','user_name','user_email','user_address','user_password','user_photo','place','place__place_name','place__district__district_name'))
-        return JsonResponse({'userdata':userdata})
+    userdata = list(tbl_user.objects.values('id','user_name','user_email','user_address','user_password','user_photo','place','place__place_name','place__district__district_name'))
+    return JsonResponse({'userdata':userdata})
 
 
+@csrf_exempt
+def user_single(request,uid):
+    if request.method == 'GET':
+        userData = list(tbl_user.objects.filter(id=uid).values('id','user_name','user_email','user_address','user_password','user_photo','place','place__place_name','place__district__district_name','place__district_id'))
+        return JsonResponse({"userData":userData})
+
+
+@csrf_exempt
+def user_edit(request,uid):
+    userData = tbl_user.objects.get(id=uid)
+    if request.method == 'POST':
+        name = request.POST.get("name")
+        email = request.POST.get("email")
+        address = request.POST.get("address")
+        place = tbl_place.objects.get(id=request.POST.get('place'))
+        photo = request.FILES.get("photo")
+        userData.user_name = name
+        userData.user_email = email
+        userData.user_address = address
+        userData.place = place
+        if photo:
+            userData.user_photo = photo
+        userData.save()
+        return JsonResponse({"msg":"Profile Updated Successfully"})
+
+
+
+@csrf_exempt
+def user_accept(request,uid):
+    if request.method == 'POST':
+        userData = tbl_user.objects.get(id=uid)
+        userData.user_status = 1
+        userData.save()
+        return JsonResponse({"msg":"User Accepted Successfully"})
+
+    
+
+@csrf_exempt
+def user_reject(request,uid):
+    if request.method == 'POST':
+        userData = tbl_user.objects.get(id=uid)
+        userData.user_status = 2
+        userData.save()
+        return JsonResponse({"msg":"User Rejected Successfully"})
+    
+
+
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        usercount = tbl_user.objects.filter(user_email=email, user_password=password).count()
+        if usercount > 0:
+            user = tbl_user.objects.get(user_email=email, user_password=password)
+            if user.user_status == 0:
+                return JsonResponse({"msg":"Your request is pending approval","user_id":user.id,"user_status":user.user_status})
+            elif user.user_status == 2:
+                return JsonResponse({"msg":"Your request has been rejected","user_id":user.id,"user_status":user.user_status})
+            elif user.user_status == 1:
+                return JsonResponse({"msg":"Login Successful","user_id":user.id,"user_status":user.user_status})
+        else:
+            return JsonResponse({"msg":"Invalid email or password"})
+
+
+
+# @csrf_exempt
+# def login(request):
+#     if request.method == 'POST':
+#         email = request.POST["email"]
+#         password = request.POST.get("password")
+#         userdata = tbl_user.objects.filter(user_email=email, user_password=password).exists()
+#         if userdata:
+#             user = tbl_user.objects.get(user_email=email,user_password=password)
+#             return JsonResponse({"msg":"Your request is pending approval","user_id":user.id,"user_status":user.user_status})
+#         else:
+#             return JsonResponse({"msg":"Invalid email or password"})
+    
+
+        
+        
+
+
+@csrf_exempt
+def change_password(request, uid):
+    userData = tbl_user.objects.get(id=uid)
+    if request.method == 'POST':
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        if userData.user_password != old_password:
+            return JsonResponse({"msg": "Old password is incorrect"})
+
+        if new_password != confirm_password:
+            return JsonResponse({"msg": "New password and confirm password do not match"})
+
+        userData.user_password = new_password
+        userData.save()
+        return JsonResponse({"msg": "Password changed successfully"})
