@@ -150,6 +150,7 @@ def place_edit(request,eid):
     if request.method == 'POST':
         place_name = request.POST.get("place_name")
         district = tbl_district.objects.get(id=request.POST.get("district"))
+        print(district)
         placeData.place_name = place_name
         placeData.district = district
         placeData.save()

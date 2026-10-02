@@ -22,7 +22,10 @@ const Login = () => {
             } else if (response.data.user_status === 1) {
                 sessionStorage.setItem('user_id', response.data.user_id);
                 alert(response.data.msg);
-                navigate('/user'); 
+                navigate('/user');
+            }
+            else {
+                alert(response.data.msg);
             }
         } catch (error) {
             console.log(error);

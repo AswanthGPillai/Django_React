@@ -107,7 +107,7 @@ const UserRegistration = () => {
                 </tr>
                 <tr>
                     <td>Photo</td>
-                    <td><input type="file" name="" id="" value={UserPhoto} onChange={(e) => setUserPhoto(e.target.files[0])} /></td>
+                    <td><input type="file" name="" id=""  onChange={(e) => setUserPhoto(e.target.files[0])} /></td>
                 </tr>
                 <tr>
                     <td>District</td>

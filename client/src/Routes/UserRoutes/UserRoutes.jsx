@@ -4,6 +4,7 @@ import Homepage from '../../User/Homepage'
 import MyProfile from '../../User/MyProfile'
 import EditProfile from '../../User/EditProfile'
 import ChangePassword from '../../User/ChangePassword'
+import PageNotFound from '../../PageNotFound/PageNotFound'
 
 const UserRoutes = () => {
   return (
@@ -13,6 +14,7 @@ const UserRoutes = () => {
                 <Route path="/myprofile" element={<MyProfile />} />
                 <Route path="/editprofile" element={<EditProfile />} />
                 <Route path="/changepassword" element={<ChangePassword />} />
+                <Route path="*" element={<PageNotFound />} />
             </Routes>
     </div>
   )

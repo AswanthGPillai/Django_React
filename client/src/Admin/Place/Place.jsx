@@ -27,7 +27,10 @@ const Place = () => {
 
 
             if (editId) {
-                const res = await axios.put(`http://127.0.0.1:8000/place_edit/${editId}/`, { place_name: place, district: district })
+                const formData = new FormData();
+                formData.append('place_name', place);
+                formData.append('district', district);
+                const res = await axios.post(`http://127.0.0.1:8000/place_edit/${editId}/`, formData )
                 alert("Place Updated Successfully")
                 fetchPlace()
             }

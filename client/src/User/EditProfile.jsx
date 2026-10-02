@@ -8,18 +8,18 @@ const EditProfile = () => {
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [district, setDistrict] = useState(null);
-    console.log(district);
-  
+  console.log(district);
+
   const [place, setPlace] = useState(null);
   console.log(place);
-  
+
   const [photo, setPhoto] = useState('');
   const [districts, setDistricts] = useState([]);
   const [places, setPlaces] = useState([]);
   console.log(districts);
-  
+
   console.log(places);
-  
+
 
   const fetchDistricts = async () => {
     try {
@@ -49,6 +49,7 @@ const EditProfile = () => {
       setEmail(response.data.userData[0].user_email);
       setAddress(response.data.userData[0].user_address);
       setDistrict(response.data.userData[0].place__district_id);
+      setPlace(response.data.userData[0].place__id);
       setPhoto(response.data.userData[0].user_photo);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -69,7 +70,7 @@ const EditProfile = () => {
 
       const response = await axios.post(`http://127.0.0.1:8000/user_edit/${userId}/`, formData);
       alert('Profile Updated Successfully');
-      fetchUserData(); 
+      fetchUserData();
 
     } catch (error) {
       console.error('Error updating user data:', error);
@@ -110,12 +111,12 @@ const EditProfile = () => {
         <tr>
           <td>Place</td>
           <td>
-            <select name="" id="" onChange={(e) => setPlace(e.target.value)}>
-              {district != null &&
-                places.filter(data => district == data.district_id).map((data, index) => (
-                  <option key={data.id} value={data.id}>{data.place_name}</option>
-                ))
-              }
+            <select name="" id="" value={place || ''} onChange={(e) => setPlace(e.target.value)}>
+              {places.filter((data) => data.district_id == district).map((data) => (
+                <option key={data.id} value={data.id}>
+                  {data.place_name}
+                </option>
+              ))}
             </select>
           </td>
         </tr>
