@@ -49,7 +49,7 @@ const EditProfile = () => {
       setEmail(response.data.userData[0].user_email);
       setAddress(response.data.userData[0].user_address);
       setDistrict(response.data.userData[0].place__district_id);
-      setPlace(response.data.userData[0].place__id);
+      setPlace(response.data.userData[0].place);
       setPhoto(response.data.userData[0].user_photo);
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -59,6 +59,10 @@ const EditProfile = () => {
 
   const handleUpdate = async () => {
     try {
+      if(place == ""){
+        alert("Place Should Be Selected..")
+        return
+      }
       const formData = new FormData();
       formData.append('name', name);
       formData.append('email', email);
@@ -101,7 +105,9 @@ const EditProfile = () => {
         <tr>
           <td>District</td>
           <td>
-            <select name="" id="" value={district} onChange={(e) => setDistrict(e.target.value)}>
+            <select name="" id="" value={district} onChange={(e) => { setDistrict(e.target.value); setPlace('') }}>
+              <option value="">--Select District--</option>
+
               {districts.map((district) => (
                 <option key={district.id} value={district.id}>{district.district_name}</option>
               ))}
@@ -112,6 +118,8 @@ const EditProfile = () => {
           <td>Place</td>
           <td>
             <select name="" id="" value={place || ''} onChange={(e) => setPlace(e.target.value)}>
+              <option value="">--Select Place--</option>
+
               {places.filter((data) => data.district_id == district).map((data) => (
                 <option key={data.id} value={data.id}>
                   {data.place_name}

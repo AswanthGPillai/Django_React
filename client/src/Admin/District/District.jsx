@@ -84,7 +84,7 @@ const District = () => {
 
                 </tr>
             </table>
-            <hr />
+            <br />
 
             <table border={1} align='center'>
                 <tr>
