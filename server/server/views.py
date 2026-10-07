@@ -1,6 +1,6 @@
 from itertools import count
 from urllib import request
-
+from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -176,15 +176,22 @@ def user(request):
         password = request.POST.get("password")
         place = tbl_place.objects.get(id=request.POST.get('place'))
         photo = request.FILES.get("photo")
-        tbl_user.objects.create(
-            user_name=name,
-            user_email=email,
-            user_address=address,
-            user_password=password,
-            place = place,
-            user_photo=photo
-            )
-        return JsonResponse({'msg':"Profile Uploded.."})
+        emailExists = tbl_user.objects.filter(user_email=email).exists()
+        if not emailExists:
+            tbl_user.objects.create(
+                user_name=name,
+                user_email=email,
+                user_address=address,
+                # user_password=make_password(password),
+                user_password=password,
+                place = place,
+                user_photo=photo
+                )
+            return JsonResponse({'msg':"Profile Uploded.."})
+        else:
+            return JsonResponse({"msg": "Email already exists"})
+
+        
 
 
 @csrf_exempt
@@ -204,7 +211,7 @@ def user_single(request,uid):
 def user_edit(request,uid):
     userData = tbl_user.objects.get(id=uid)
     if request.method == 'POST':
-        name = request.POST.get("name")
+        name = request.POST.get("name") 
         email = request.POST.get("email")
         address = request.POST.get("address")
         place = tbl_place.objects.get(id=request.POST.get('place'))
@@ -240,36 +247,43 @@ def user_reject(request,uid):
     
 
 
+# @csrf_exempt
+# def login(request):
+#     if request.method == 'POST':
+#         email = request.POST.get("email")
+#         password = request.POST.get("password")
+#         usercount = tbl_user.objects.filter(user_email=email, user_password=password).count()
+#         if usercount > 0:
+#             user = tbl_user.objects.get(user_email=email, user_password=password)
+#             if user.user_status == 0:
+#                 return JsonResponse({"msg":"Your request is pending approval","user_id":user.id,"user_status":user.user_status})
+#             elif user.user_status == 2:
+#                 return JsonResponse({"msg":"Your request has been rejected","user_id":user.id,"user_status":user.user_status})
+#             elif user.user_status == 1:
+#                 return JsonResponse({"msg":"Login Successful","user_id":user.id,"user_status":user.user_status})
+#         else:
+#             return JsonResponse({"msg":"Invalid email or password"})
+
+
+
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
         email = request.POST.get("email")
         password = request.POST.get("password")
-        usercount = tbl_user.objects.filter(user_email=email, user_password=password).count()
-        if usercount > 0:
-            user = tbl_user.objects.get(user_email=email, user_password=password)
+        userdata = tbl_user.objects.filter( user_email=email, user_password=password).exists()
+        # user = tbl_user.objects.filter(user_email=email).first()
+        # if user and check_password(password, user.user_password):
+        if userdata:
+            user = tbl_user.objects.get(user_email=email,user_password=password)
             if user.user_status == 0:
-                return JsonResponse({"msg":"Your request is pending approval","user_id":user.id,"user_status":user.user_status})
+                return JsonResponse({"msg": "Your request is pending approval","user_id": user.id,"user_status": user.user_status})
             elif user.user_status == 2:
-                return JsonResponse({"msg":"Your request has been rejected","user_id":user.id,"user_status":user.user_status})
+                return JsonResponse({"msg": "Your request has been rejected","user_id": user.id,"user_status": user.user_status})
             elif user.user_status == 1:
-                return JsonResponse({"msg":"Login Successful","user_id":user.id,"user_status":user.user_status})
+                return JsonResponse({"msg": "Login Successful","user_id": user.id,"user_status": user.user_status})
         else:
-            return JsonResponse({"msg":"Invalid email or password"})
-
-
-
-# @csrf_exempt
-# def login(request):
-#     if request.method == 'POST':
-#         email = request.POST["email"]
-#         password = request.POST.get("password")
-#         userdata = tbl_user.objects.filter(user_email=email, user_password=password).exists()
-#         if userdata:
-#             user = tbl_user.objects.get(user_email=email,user_password=password)
-#             return JsonResponse({"msg":"Your request is pending approval","user_id":user.id,"user_status":user.user_status})
-#         else:
-#             return JsonResponse({"msg":"Invalid email or password"})
+            return JsonResponse({"msg": "Invalid email or password"})
     
 
         
