@@ -1,18 +1,18 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 const UserRegistration = () => {
     const [UserName, setUserName] = useState("")
     const [UserEmail, setUserEmail] = useState("")
     const [UserAddress, setUserAddress] = useState("")
-    const [UserPhoto, setUserPhoto] = useState("")
+    const [UserPhoto, setUserPhoto] = useState(null)
     const [UserPassword, setUserPassword] = useState("")
     const [district, setDistrict] = useState("")
     const [place, setPlace] = useState("")
     const [districts, setDistricts] = useState([])
     const [places, setPlaces] = useState([])
 
-    
+    const InputRef = useRef()
     console.log(district);
 
     console.log(places);
@@ -21,12 +21,11 @@ const UserRegistration = () => {
         setUserName("");
         setUserEmail("");
         setUserAddress("");
-        setUserPhoto("");
         setUserPassword("");
         setPlace();
         setDistrict();
 
-
+        InputRef.current.value = ""
 
 
     }
@@ -107,7 +106,7 @@ const UserRegistration = () => {
                 </tr>
                 <tr>
                     <td>Photo</td>
-                    <td><input type="file" name="" id=""  onChange={(e) => setUserPhoto(e.target.files[0])} /></td>
+                    <td><input type="file" name="" id="" ref={InputRef} onChange={(e) => setUserPhoto(e.target.files[0])} /></td>
                 </tr>
                 <tr>
                     <td>District</td>
